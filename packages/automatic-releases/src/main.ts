@@ -305,7 +305,7 @@ export const main = async (): Promise<void> => {
     }
 
     const releaseBody = args.additionalReleaseBody
-      ? changelog + '## Additional Information\n' + `${args.additionalReleaseBody}`
+      ? changelog + '\n\n## Additional Information\n\n' + `${args.additionalReleaseBody}`
       : changelog;
 
     const releaseUploadUrl = await generateNewGitHubRelease(client, {
