@@ -18,6 +18,7 @@ type Args = {
   preRelease: boolean;
   releaseTitle: string;
   files: string[];
+  additionalReleaseBody: string;
 };
 
 const getAndValidateArgs = (): Args => {
@@ -28,6 +29,7 @@ const getAndValidateArgs = (): Args => {
     preRelease: JSON.parse(core.getInput('prerelease', {required: true})),
     releaseTitle: core.getInput('title', {required: false}),
     files: [] as string[],
+    additionalReleaseBody: core.getInput('additional_release_body', {required: false}),
   };
 
   const inputFilesStr = core.getInput('files', {required: false});
@@ -302,6 +304,10 @@ export const main = async (): Promise<void> => {
       });
     }
 
+    const releaseBody = args.additionalReleaseBody
+      ? changelog + '## Additional Information\n' + `${args.additionalReleaseBody}`
+      : changelog;
+
     const releaseUploadUrl = await generateNewGitHubRelease(client, {
       owner: context.repo.owner,
       repo: context.repo.repo,
@@ -309,7 +315,7 @@ export const main = async (): Promise<void> => {
       name: args.releaseTitle ? args.releaseTitle : releaseTag,
       draft: args.draftRelease,
       prerelease: args.preRelease,
-      body: changelog,
+      body: releaseBody,
     });
 
     await uploadReleaseArtifacts(client, releaseUploadUrl, args.files);
